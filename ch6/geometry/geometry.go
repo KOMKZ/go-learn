@@ -2,6 +2,7 @@ package geometry
 
 import (
 	"math"
+	"image/color"
 )
 
 type Point struct {
@@ -29,6 +30,11 @@ func (path Path) Distance() float64{
 		}
 	}
 	return sum
+}
+
+type ColorPoint struct {
+	Point
+	Color color.RGBA
 }
 
 

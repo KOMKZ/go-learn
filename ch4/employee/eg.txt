@@ -1,0 +1,21 @@
+	// 下面个这个方法返回的是指针，正确调用
+	fmt.Println(employee.EmployeePointerById(1).Name)
+	employee.EmployeePointerById(1).Name = "lk"
+	fmt.Println(employee.EmployeePointerById(1).Name)
+	fmt.Println(employee.EmployeeById(1).Name)
+	// 下面这条不能正确编译
+	// 因爲在賦值語句的左邊併不確定是一個變量（譯註：調用函數返迴的是值，併不是一個可取地址的變量）
+	employee.EmployeeById(1).Name = "lk"
+	fmt.Println(employee.EmployeeById(1).Name)
+
+	e := employee.Employee{1, "kitalzhong", "shenzhen"}
+	e2 := &employee.Employee{2, "lartikzhong", "shenzhen"}
+	fmt.Println(e.Id) // variable of type Employee
+	fmt.Println(e2.Id) // implictly (*e2)
+	fmt.Println((*e2).Id) // same to upper
+	position := &(*e2).Position
+	*position = (*e2).Position + " nanshan"
+	fmt.Println((*e2).Position) // shenzhen nanshan 结构体的也是一个变量,变量也有地址
+
+
+
