@@ -1,0 +1,40 @@
+	a := [...]int{0,1,2,3,4,5,6,7,8,9,10,11,12}
+	s := a[:0]
+	fmt.Println(s)
+	fmt.Println(s == nil) // false
+	s2 := []int{}
+	fmt.Println(s2 == nil) // false
+	var s3 []int
+	fmt.Println(s3 == nil) // true
+	s4 := []int(nil)
+	fmt.Println(s4 == nil) // true
+	s5 := make([]int, 3, 3)
+	fmt.Println(s5 == nil) // false
+	// same to following
+	// 底层数组的容量是8,slice的长度是3,8的设定用于增长
+	s7 := make([]int, 8)[:3]
+	fmt.Println(s7 == nil) // false
+	s6 := make([]int, 0, 0)
+	fmt.Println(s6 == nil) // false
+
+	a := [...]int{0,1,2,3,4,5,6,7,8,9,10,11,12}
+	fmt.Println(a)
+	rev.Reverse(a[:])
+	fmt.Println(a)
+
+	a := [...]int{0,1,2,3,4,5,6,7,8,9,10,11,12}
+	// [6,7,8] len =3, cap = 13-6 = 7
+	summer := a[6:9]
+	// extend a slice, [6,7,8,9,10,11,12]
+	fmt.Println(summer[0:7])
+	// throw a panic, slicing beyong cap(s) causes a panic
+	fmt.Println(summer[:8])
+
+
+	a := [...]int{0,1,2,3,4,5,6,7,8,9,10,11,12}
+	summer := a[6:9]
+	fmt.Println(summer) // [6 7 8]
+	summer[0] = 7
+	// 修改slice 会同时修改底层的array
+	fmt.Println(summer) // [7 7 8]
+	fmt.Println(a) // [0 1 2 3 4 5 7 7 8 9 10 11 12]
