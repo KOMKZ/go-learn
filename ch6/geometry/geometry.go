@@ -13,6 +13,14 @@ func (p Point) Distance(q Point) float64{
 	return math.Hypot(p.X - q.Y, p.Y - q.Y)
 }
 
+func (p Point) Add(q Point) Point  {
+	return Point{p.X + q.X, q.X + q.Y}
+}
+
+func (p Point) Sub(q Point) Point  {
+	return Point{p.X - p.X, q.X - q.Y}
+}
+
 func (p *Point) ScaleBy(factor float64) {
 	p.X *= factor
 	p.Y *= factor

@@ -1,0 +1,8 @@
+	var c bytecounter.ByteCounter
+	c.Write([]byte("hello world"))
+	fmt.Println(c)
+	// reset to zero
+	c = 0
+	// 变量c实现 io.Writer的接口
+	fmt.Fprintf(&c, "hello %s", "kitral")
+	fmt.Println(c)

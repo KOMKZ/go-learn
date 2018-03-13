@@ -1,0 +1,79 @@
+
+/*
+// 同个包内的封装方是可以直接访问的
+package main
+
+import (
+	"fmt"
+)
+type T struct {
+	name string
+}
+
+func (t T)getName()string {
+	return t.name
+}
+func main()  {
+	t := T{"kz"}
+	fmt.Println(t.getName())
+}
+
+*/
+
+
+
+/*
+	var op  func(p, q geometry.Point) geometry.Point
+	if true {
+		op = geometry.Point.Add
+	}else{
+		op = geometry.Point.Sub
+	}
+	fmt.Println(op(geometry.Point{2,1}, geometry.Point{2,3}))
+*/
+
+/*
+	p := geometry.Point{1,2}
+	q := geometry.Point{2,3}
+	// geometry.Point.Distance 这是一个选择器 本身返回一个函数值 相当于一个匿名函数的感觉
+	PointDistance := p.Distance
+	fmt.Println(PointDistance(q))
+	// 上面的方法使用p作为接收器 如果不指定接收器的话 则第一个参数应该作为接受器参数
+	DirectPointDistance := geometry.Point.Distance
+	fmt.Println(DirectPointDistance(p, q))
+*/
+
+/*
+	p := geometry.Point{1,2}
+	q := geometry.Point{2,3}
+	// geometry.Point.Distance 这是一个选择器 本身返回一个函数值 相当于一个匿名函数的感觉
+	PointDistance := p.Distance
+	fmt.Println(PointDistance(q))
+*/
+
+
+/*
+
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+var cache = struct {
+	sync.Mutex
+	mapping map[string]string
+}{
+	mapping: make(map[string]string),
+}
+// 继承类型的sync.Mutex的所有方法
+func lookup(key string) string  {
+	cache.Lock()
+	s := cache.mapping[key]
+	cache.Unlock()
+	return s
+}
+func main()  {
+	fmt.Println(lookup("name"))
+}
+*/
