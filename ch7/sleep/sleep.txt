@@ -1,0 +1,21 @@
+
+
+/*
+package main
+
+import (
+	"flag"
+	"time"
+	"fmt"
+)
+// 调用 ./learn -period 10s
+var period = flag.Duration("period", 1 * time.Second, "sleep period")
+
+func main()  {
+	flag.Parse()
+	fmt.Printf("%T\n", period)
+	fmt.Printf("sleeping for %v...", period)
+	time.Sleep(*period)
+	fmt.Println()
+}
+*/

@@ -1,10 +1,13 @@
 package main
 
 import (
-	"fmt"
-	"learn/ch7/bytecounter"
+
 )
+// 调用 ./learn -period 10s
+
 
 func main()  {
 
 }
+
+
