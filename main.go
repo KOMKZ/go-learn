@@ -1,13 +1,15 @@
 package main
 
 import (
-
+	"fmt"
+	"flag"
+	"os"
+	"io"
 )
-// 调用 ./learn -period 10s
-
 
 func main()  {
-
+	io.Writer()
+	os.Stdout
 }
 
 

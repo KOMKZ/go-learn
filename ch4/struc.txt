@@ -1,3 +1,11 @@
+/*
+var _ fmt.Stringer = &s // OK
+var _ fmt.Stringer = s // compile error: IntSet lacks String method
+//变量s的指针类型才有对应的String方法,变量本身没有这个方法,所以变量本身是没有实现该接口的
+
+*/
+
+
 
 /*
 // 同个包内的封装方是可以直接访问的

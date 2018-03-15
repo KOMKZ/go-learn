@@ -3,6 +3,7 @@ package tempconv
 import (
 	"learn/ch2/tempconv0"
 	"fmt"
+	"flag"
 )
 
 type celsiusFlag struct {
@@ -12,7 +13,7 @@ type celsiusFlag struct {
 func (f *celsiusFlag) Set(s string) error  {
 	var value float64
 	var unit string
-	fmt.Sscan(s, "%f%s", &value, &unit)
+	fmt.Sscanf(s, "%f%s", &value, &unit)
 	switch unit {
 	case "C":
 		f.Celsius = tempconv0.Celsius(value)
@@ -22,4 +23,13 @@ func (f *celsiusFlag) Set(s string) error  {
 		return nil
 	}
 	return fmt.Errorf("invalid temperature %q", s)
+}
+
+
+
+
+func CelsiusFlat(name string, value tempconv0.Celsius, usage string) *tempconv0.Celsius  {
+	f := celsiusFlag{value}
+	flag.CommandLine.Var(&f, name, usage)
+	return &f.Celsius
 }

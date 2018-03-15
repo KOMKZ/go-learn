@@ -1,0 +1,18 @@
+/*
+package main
+
+import (
+	"fmt"
+	"learn/ch7/tempconv"
+	"flag"
+)
+var temp = tempconv.CelsiusFlat("temp", 20.0, "the temperature")
+
+func main()  {
+	flag.Parse()
+	// 如果String方法定义在celsiusFlag类型上，则这里应该打印的是Flag.Value类型
+	fmt.Println(*temp)\
+}
+
+
+*/

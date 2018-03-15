@@ -1,5 +1,7 @@
 package tempconv0
 
+import "fmt"
+
 type Celsius float64 // 摄氏度
 type Fahrenheit float64 // 华氏度
 
@@ -15,4 +17,8 @@ func CToF(c Celsius) Fahrenheit  {
 
 func FToC(f Fahrenheit) Celsius  {
 	return Celsius((f - 32) * 5/9)
+}
+
+func (c Celsius)String()string  {
+	return fmt.Sprintf("%.2fC", c)
 }

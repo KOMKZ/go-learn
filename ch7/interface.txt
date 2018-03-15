@@ -1,0 +1,9 @@
+/*
+	var any interface{}
+	any = true
+	any = 1
+	any = [1]int{1}
+	any = []int{2}
+	any = map[string]string{"name":"kitral"}
+	fmt.Println(any)
+*/
