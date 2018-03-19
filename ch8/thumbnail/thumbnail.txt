@@ -1,0 +1,70 @@
+
+func MakeThumbnails(files []string, base string)  {
+	for _, filePath := range files {
+		thumbFile, err := thumbnail.ImageFile(base + "/" + filePath)
+		if err != nil {
+			fmt.Printf("error:%s\n", err)
+			return
+		}
+		fmt.Printf("thumbnail file %s\n", thumbFile)
+	}
+}
+
+func MakeThumbnails1(files []string, base string)  {
+	for _, filePath := range files {
+		// 这种做法时错误的 go 调起routine会立即返回
+		// 循环结束后 主函数退出 会导致goroutin 的中断
+		go thumbnail.ImageFile(base + "/" + filePath)
+	}
+}
+
+func MakeThumbnails2(files []string, base string)  {
+	ch := make(chan struct{})
+	for _, f := range files{
+		go func(f string){
+			thumbnail.ImageFile(base + "/" + f)
+			ch <- struct{}{}
+		}(f)
+	}
+	for range files{
+		// 这种我们没有使用管道返回的值
+		s := <- ch
+		fmt.Println(s)
+	}
+}
+
+func MakeThumbnails3(files []string, base string) error  {
+	ch := make(chan error)
+	for _, f := range files{
+		go func(f string){
+			_, err := thumbnail.ImageFile(base + "/" + f)
+			ch <- err
+		}(f)
+	}
+	for range files{
+		if err := <- ch;err != nil{
+			// 如果进入这一步的话 则ch没有正确的被排空 err := <- ch这句话没有被执行到 等价没有接受者
+			// 所以会有潜在的 goroutine leak
+			return err
+		}
+		//<- ch // 注意这种相当与有接受者
+	}
+	return nil
+}
+
+func MakeThumbnails4(files []string, base string) error  {
+	// ? 书上说这里能够让goroutine正常退出 但是没效果
+	ch := make(chan error, len(files))
+	for _, f := range files{
+		go func(f string) {
+			_, err := thumbnail.ImageFile(base + "/" + f)
+			ch <- err
+		}(f)
+	}
+	for range files{
+		if err := <- ch; err != nil {
+			return err
+		}
+	}
+	return nil
+}
