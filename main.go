@@ -1,9 +1,8 @@
 package main
 
-func main()  {
-<<<<<<< HEAD
+import "gopl.io/ch8/thumbnail"
 
-=======
-	
->>>>>>> fc663d1b0505b4f8ae322411ba9cf1526ccbd61a
+func main()  {
+	f := "/home/master/tmp/abc.jpg"
+	thumbnail.ImageFile(f)
 }
