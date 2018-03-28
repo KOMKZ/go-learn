@@ -1,0 +1,16 @@
+package main
+
+import (
+	"fmt"
+)
+
+func foo(){
+	fmt.Println(1)
+}
+
+func main()  {
+	// 整个程序有可能打印两个数字 也有可能打印一个数字 因为routine在没有来得及执行前
+	// 主routine已经退出了
+	go foo()
+	fmt.Println(2)
+}

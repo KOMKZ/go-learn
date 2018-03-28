@@ -1,0 +1,57 @@
+package main
+
+import (
+	"fmt"
+	"time"
+	"os"
+)
+
+func main()  {
+	fmt.Println("Commencing countdown")
+	abort := make(chan struct{})
+	go func() {
+		os.Stdin.Read(make([]byte, 1))
+		abort <- struct{}{}
+	}()
+	tick := time.Tick(1 * time.Second)
+	for countdown := 10; countdown > 0; countdown--{
+		fmt.Println(countdown)
+		// chan 发送的时候会阻塞住
+		<-tick
+	}
+	fmt.Println("lauching...")
+}
+
+func launch(){
+	fmt.Println("Lift off...")
+}
+
+/*
+package main
+
+import (
+	"fmt"
+	"os"
+	"time"
+)
+
+func main()  {
+	fmt.Println("Commencing countdown")
+	abort := make(chan struct{})
+	go func() {
+		os.Stdin.Read(make([]byte, 1))
+		abort <- struct{}{}
+	}()
+	select {
+	case <- time.After(10 * time.Second):
+	case <- abort:
+		fmt.Println("Lanuch aborted!")
+		return
+	}
+	launch()
+}
+
+func launch(){
+	fmt.Println("Lift off...")
+}
+*/
