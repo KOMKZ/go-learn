@@ -1,3 +1,17 @@
+func main(){
+	const basePath = "/home/kitralzhong/tmp/gangan"
+	files := []string{
+		"gangan12.jpg",
+		"gangan1.jpg",
+	}
+	for i:=1; i<10;i++{
+		err := MakeThumbnails4(files, basePath)
+		if err != nil {
+			fmt.Printf("%s\n", err)
+		}
+		fmt.Printf("%d %d\n", i, runtime.NumGoroutine())
+	}
+}
 
 func MakeThumbnails(files []string, base string)  {
 	for _, filePath := range files {
@@ -68,3 +82,78 @@ func MakeThumbnails4(files []string, base string) error  {
 	}
 	return nil
 }
+
+/*
+
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main()  {
+	ch := make(chan string)
+	count := 3
+	go func() {
+		for i := 0; i < count; i++ {
+			fmt.Println("goroutine send a message")
+			ch <- fmt.Sprintf("message %d", i)
+		}
+	}()
+	time.Sleep(2 * time.Second)
+	for i:=0; i<count; i++{
+		fmt.Println(<-ch)
+	}
+	// 如果ch是满的 会阻塞注接收 如果没有阻塞的话 则应该是先打印出3个 goroutine send a message
+	// 但是可以设置缓冲的chan来达到写入的不阻塞
+	/*
+	goroutine send a message
+	// sleep 2 seconds
+	message 0
+	goroutine send a message
+	goroutine send a message
+	message 1
+	message 2
+	 */
+}
+
+
+*/
+
+/*
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main()  {
+	count := 10
+	chanLen := 2
+	// 2 的容量可以同时允许3个 不阻塞的写入
+	ch := make(chan string, chanLen)
+	go func() {
+		for i := 0; i < count; i++ {
+			fmt.Println("goroutine send a message")
+			ch <- fmt.Sprintf("message %d", i)
+		}
+	}()
+	time.Sleep(2 * time.Second)
+	for i:=0; i<count; i++{
+		fmt.Println(<-ch)
+	}
+	// 如果ch是满的 会阻塞注接收 如果没有阻塞的话 则应该是先打印出3个 goroutine send a message
+	// 但是可以设置缓冲的chan来达到写入的不阻塞
+	/*
+	goroutine send a message
+	// sleep 2 seconds
+	message 0
+	goroutine send a message
+	goroutine send a message
+	message 1
+	message 2
+	 */
+}
+*/

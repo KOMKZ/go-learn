@@ -1,16 +1,199 @@
-package main
+	// 无缓冲信道存消息和取消息都是阻塞的
+	// 取消息会阻塞当前routine
+	// 写如消息也会阻塞当前routine
+	// 开启一个not buffered channel的时候 准备读取的时候 必须有数据进来 否则就会阻塞住一直等待数据写入
+	// 对一个not buffered channel 进行写入操作的时候 如果数据没有被读出 则channel是满的 该routine一直会被挂起 知道数据被取出
+	// 对于一个 not buffered channel 来说 读取大部分下是成对的
 
-import (
-	"fmt"
-)
+	// channel的作用可以用来通知main routine当前的routine已经完毕了 你可以退出了 例子如下
+	/*
+	ch := make(chan struct{})
+	go func() {
+		fmt.Println("handle 1 second...")
+		time.Sleep(time.Second)
+		ch <- struct{}{}
+	}()
+	<-ch
+	fmt.Println("ok")
+	// handle 1 second...
+	// ok
+	*/
 
-func foo(){
-	fmt.Println(1)
-}
+	// 引起死锁 一个routine在等待数据 一个迟迟不肯写入数据 或者相反比如
+	// 一般思维看下来 先写入到了ch 然后就把ch读出来非常完美不是吗？错
+	// ch <- 1 写入的过程 如果ch的数据没有被取出去 这里就会被把当前进程给阻塞住了
+	// 然后后面的的 <-ch 就一直在等着当前routine的释放 形成死锁deadlock
+	/*
+	ch := make(chan int)
+	ch <- 1
+	fmt.Println(<-ch)
+	*/
 
-func main()  {
-	// 整个程序有可能打印两个数字 也有可能打印一个数字 因为routine在没有来得及执行前
-	// 主routine已经退出了
-	go foo()
-	fmt.Println(2)
-}
+	// 再来看一个比较经典的死锁问题
+	/*
+	// 创建两个channel
+	ch, quit := make(chan int), make(chan int)
+	// 下面的匿名函数很快执行然后就到读取quit的语句
+	go func() {
+		// ch被写入了一个数据，但是这个数据一直没有被取出去 所以当前先routine被永远挂起
+		ch <- 1
+		// quit这个channel一直没有写入数据，导致外层的routine一直在等待，死锁出现
+		quit <- 0
+	}()
+	// 这条语句会阻塞当前进程 知道quit有数据读出来为止
+	<- quit
+	fmt.Printf("ok")
+	*/
+	// 并不是所有的没有配对的都会引起死锁啊
+	// 原因是主进程已经退出了 但是此时的routine 被挂起来
+	/*
+	ch := make(chan int)
+	go func() {
+		ch <- 1
+	}()
+	fmt.Printf("hello world")
+	*/
+	// 相对来说 缓冲信道能够解决一定的阻塞问题 如下
+	// 注意 ch 这个channel有个1个数据的容纳力，也就是存入1个数据 即使数据没有在其他routine取出的话
+	// 不必阻塞当前routine等待数据被取走
+	// 也不会挂起当前的routine 所以下面这个程序能够正常的跑起来
+	/*
+	ch, quit := make(chan int, 1), make(chan int)
+	go func() {
+		ch <- 1
+		quit <- 0
+	}()
+	<- quit
+	fmt.Printf("ok")
+	*/
+
+	// 无缓冲信道的数据的出来顺序
+	// 先进先出 所以一般来说这里就是按顺序打印出来
+	/*
+	ch := make(chan int)
+	for i:=0; i<5; i++{
+		go func(i int) {
+			ch <- i
+		}(i)
+	}
+	for i:=0; i<5; i++{
+		fmt.Println(i)
+	}
+	*/
+	// 缓冲信道的的阻塞等到数据达到容纳量的时候就会阻塞当前routine, 如
+	// 而且缓冲信道是先进先出的
+
+	/*
+	ch := make(chan int, 3)
+	ch <- 1
+	ch <- 2
+	ch <- 3
+	// 这里不会引起死锁 但是多一个写入数据的时候就会报死锁了
+	//ch <- 1
+	fmt.Println("ok")
+	*/
+
+	// 信道的读取
+	/*
+	ch := make(chan int, 3)
+	ch <- 1
+	ch <- 2
+	ch <- 3
+	// 这里需要注意一点 首先信道的读取一般来说都是成对的
+	// 但是 range 会一直读下去 除非channel被关闭
+	// 这样就会报死锁 因为一直在等数据写入进来 但是没有数据写进来
+	// 两种方法
+	// 1. 一种是检测判断
+	// 2. 一种是直接关闭channel， 关闭的channel不能写入 只能读取
+	//
+	close(ch)
+	for v := range ch{
+		fmt.Println(v)
+
+		//if len(ch) <= 0{
+		//	break
+		//}
+
+	}
+	*/
+	// 方案对比
+	// 1. 无缓冲的数据时一个写入 然后出来
+	// 2. 有缓冲的就是可以批量写入 然后出来
+
+
+
+
+	package main
+
+    import (
+    	"fmt"
+    	"runtime"
+    	"time"
+    )
+    var quit chan int = make(chan int)
+
+    func loop()  {
+    	// 如果不用这句的话 可能在下个routine执行前 当前routine旧跑完了 所以routine们都
+    	// 等待1秒的时间 然后让他们几乎同时一起取
+    	time.Sleep(time.Second);
+    	for i:=0; i<10; i++{
+    		fmt.Printf("%d ", i)
+    	}
+    	quit <- 0
+    }
+    func main()  {
+    	runtime.GOMAXPROCS(2)
+    	// 我们需要用到runtime包(runtime包是goroutine的调度器):告诉Go我们允许同时最多使用多个核 来达到并行
+    	go loop()
+    	go loop()
+    	for i := 0; i < 2; i++ {
+    		<- quit
+    	}
+    	//0 0 1 2 1 3 2 4 3 5 4 6 5 7 6 8 7 9 8 9 说明Go开了不止一个原生线程，达到了真正的并行
+    	// 0 0 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8 8 9 9
+    	// 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 说明Go开一个原生线程，单线程上的goroutine不阻塞不松开CPU
+    }
+
+
+
+    /*
+    var quit chan int = make(chan int)
+    func loop()  {
+    	for i:=0; i<10; i++{
+    		time.Sleep(100*time.Millisecond)
+    		fmt.Printf("%d ", i)
+    	}
+    	quit <- 0
+    }
+    func main()  {
+    	go loop()
+    	go loop()
+    	<- quit
+    	<- quit
+    	// 0 0 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8 8 9 9
+    	// 这种证明了时能够支持并发 重叠时间范围内有两个程序可以执行
+    }
+    */
+    /*
+    var quit chan int = make(chan int)
+    func loop()  {
+    	for i:=0; i<10; i++{
+    		fmt.Printf("%d ", i)
+    	}
+    	quit <- 0
+    }
+    func main()  {
+    	go loop()
+    	go loop()
+    	<- quit
+    	<- quit
+    	// 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9
+    	// 疑问 不应该时是抢占方式的输出吗
+    	// 并行和并发？
+    	// 并发： 不同执行可以在有重叠的时间范围内执行 并没有要求 重叠时间范围内不同的执行一定都得在执行 比如携程
+    	// 并行 时间范围内 有多个执行工作单位
+    	// 知识点：
+    	// 1. 默认Go所有的goroutines只能在一个线程里跑，所以上诉的代码只能说是支持并发的（本质就是携程
+    	// 1. 所以当前的routine如果不发生阻塞的话，是不会让出cpu给其他routine的 所以上诉的程序就会实现一个一个输出
+    }
+    */
