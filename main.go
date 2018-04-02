@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
-	"math/rand"
 )
 
 /*
@@ -49,6 +47,12 @@ func fanIn(chs... chan int) chan int{
 }
 */
 
+func foo(i int)chan int{
+	ch := make(chan int)
+	go func() {ch <- i}()
+	return ch
+}
+
 func main()  {
 	// 应用-生成器 模拟python的xrange 只有登到数据需要的时候才生成数据adf
 	/*
@@ -71,5 +75,21 @@ func main()  {
 		fmt.Println(<-result)
 	}
 	*/
-	
+
+	// 应用 select 监听信道 同时收集多个管道的数据
+	ch1, ch2, ch3 := foo(1), foo(2), foo(3)
+	ch := make(chan int)
+	go func() {
+		for  {
+			select {
+			case v1:=<-ch1:ch<-v1
+			case v2:=<-ch2:ch<-v2
+			case v3:=<-ch3:ch<-v3
+			}
+		}
+	}()
+	for i:=0; i<3;i++{
+		fmt.Println(<-ch)
+	}
+	fmt.Println("over")
 }
